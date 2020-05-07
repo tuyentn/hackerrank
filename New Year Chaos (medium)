@@ -1,0 +1,30 @@
+def minimumBribes(q):
+
+    flag = True
+    A = [0] + q
+    for i,x in enumerate(A):
+        if x-i > 2:
+            print('Too chaotic')
+            flag = False
+            break
+    if(flag):
+        curr = 0
+        i = 1
+        step = 0
+        while i < len(A)-1:
+            j=i
+            if (A[i] > i):
+                
+                j = i +1
+                while (j < len(A)-1 and A[j] != i):
+                    j += 1
+                
+                A = A[0:i] + A[j:j+1] + A[i:j] + A[j+1:]
+                curr = i
+                
+            # print(A)
+            step += j-i
+            # print('Step = '+ str(step))
+            curr +=1
+            i = curr
+        print(step)
