@@ -1,40 +1,54 @@
 def minimumBribes(q):
-
+    
+    #Each person x, calculate how many time he bribe others => sum(): total swap
+    #1. Note that he only bribe lower person to get lower postion 
+    #   => number of his birbe = number of lower person behind him
+    #   => number of his birbe = x - number of lower person front of him
+    #   => stepSwap += x - B[x]
+    
+    #2. Count number of lower person front of x
+    # a) loop t in A[1:P[x]]: 
+    #        if (t < x): B[x] += 1
+    #    This way need 1 more loop to count: O(n*n)
+    # b) Calculate based on B[x-1], B[x-2], B[x-3]
+    #    While looping, if x-1 appeared (P[x-1] assigned):
+    #        number of < x [1->P[x]] =  number of < x [1->P[x-1]] + number of < x [P[x-1] -> P[x]]
+    #        [0, 1 ,2,..., x-1,      10, 11, 12, 13                     ,   x, .... ]
+    #                B[x-1]   + number of < x value from P[x-1]->P[x]  =  B[x] 
+    #        B[x] = B[x-1] + count[t<x for t in A[P[x-1]:P[x]] ]
+    #    If x-1 didn't appear, calculate based on B[x-2] or B[x-3]
+    # Time complexity = O(n+n) = O(n)
+    
+    
     A = [0] + q
-    ## B[x]: number person < x and infront of x ^= number of person that x didn't bribed
-    B = [-1]*len(A)  
-    P = [-1]*len(A)
-    step = 0
+    B = [0]*len(A)  
     B[0] = 0
+    
+    P = [-1]*len(A)
     P[0] = 0
+    
+    step = 0
     for i, x in enumerate(A):
         if i == 0: continue
         if (x -i > 2):
-#             print('x = '+str(x)+'i = '+str(i))
             return 'Too chaotic'
-        P[x] = i
-        ## if x
-        if (B[x-1] != -1): 
-            add2 = 1
-            for k in range(P[x-1]+1, i):
-                if A[k] < x:
-                   add2 +=1 
-#             print('i = {}, P[x-1] = {}, add {}-1: {}'.format(i, P[x-1], x, add2))
-            B[x] = B[x-1] + add2
-        elif (B[x-2] != -1): 
-            add2 = 1
-            for k in range(P[x-2]+1, i):
-                if A[k] < x:
-                   add2 +=1 
-            B[x] = B[x-2] + add2
-        elif (B[x-3] != -1): 
-            add2 = 1
-            for k in range(P[x-3]+1, i):
-                if A[k] < x:
-                   add2 +=1 
-            B[x] = B[x-3] + add2
-        else: B[x] = 0
-        ## x had bribed x - B[x] persons
+        P[x] = i                 #position of person x
+        # if x-1 appeared, B[x]
+        if (P[x-1] != -1): 
+            B[x] = B[x-1] + 1    #person x-1 < x  
+            for t in A[P[x-1]+1:P[x]]:
+                if t < x:
+                   B[x] +=1 
+        elif (P[x-2] != -1): 
+            B[x] = B[x-2] + 1    
+            for t in A[P[x-2]+1:P[x]]:
+                if t < x:
+                   B[x] +=1 
+        elif (P[x-3] != -1): 
+            B[x] = B[x-3] + 1           
+            for t in A[P[x-3]+1:P[x]]:
+                if t < x:
+                   B[x] +=1 
 #         print('B[{}]={}'.format(x, B[x]))
         step = step + x - B[x]
     return step
